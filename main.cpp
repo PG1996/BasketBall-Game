@@ -93,7 +93,7 @@ glVertex2f(30.0,60.0);
 //glVertex2f(24.0,50.0);
 glEnd();
 glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
-glBegin(GL_POINT);
+glBegin(GL_POLYGON);
 int cx1 = 25.0,cy1 = 42.5,r1 = 18;
 for(int ii = 0; ii < num_segments; ii++)
 
