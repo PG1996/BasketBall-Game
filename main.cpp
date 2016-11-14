@@ -5,308 +5,316 @@
 #include <unistd.h>
 #include<math.h>
 using namespace std;
-double th;
+double angle;
 void init2D(float r, float g, float b)
 
 {
 
-
-
-// glClearColor sets the colour to clear the buffer
-
-//to.
-
 glClearColor(r, g, b, 0.0);
-
-// used to set up the view volume,
-
-//GL_MODELVIEW can be used to set up viewing
-
-//transformation
 
 glMatrixMode(GL_PROJECTION);
 
-// gluOrtho2D specifies the coordinates to be used
-
-//with the viewport which defaults to the window size.
-
-gluOrtho2D(0.0, 200.0, 0.0, 200.0);
-}
-
-void translate(double x, double y, double x1,double y1,double vec[][3]) {
-    vec[0][0] = x-x1;
-    vec[0][1] = y-y1;
-
+gluOrtho2D(0.0, 210.0, 0.0, 200.0);
 }
 void keyboard( unsigned char key, int x, int y )
 {
     if( key == 'g' )
     {
-        cin >> th;
+        cin >> angle;
     }
 }
 
 void display(void)
 
 {
-while (th < 90) {
-double cx = 100, cy = 100, r = 5;
 
-int num_segments = 100;
-double z[3][3];
+    double z[3][3];
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 0.0, 0.0);
 
-// clear the buffers currently enabled for color
+    int flag=0;  //IF Ball hits the ceiling
+    int flag1=0;  //IF Ball hits the Rim and Falls on the ground
+    int flag2=0;  //IF Ball hits The Pole
+    int flag3=0; //IF Ball goes into the Basket
 
-//writing.
+    /*------Different co-ordinates for Ball*/
+    int Y_BallHitsCeiling=0,RelativeX_BallHitsPole=1;
+    double X_BallHitsCeiling,X_BallHitsRim,X_BallInBasket,Y_BallInBasket,X_BallHitsPole,Y_BallHitsPole;
 
-glClear(GL_COLOR_BUFFER_BIT);
+    float y1=0, theta = ((3.1415926f)/180)*(angle),x1=0;
+    //cin >> th;
+    double cx = 100, cy = 100, r = 5;   // Center Coordinates and Radius Of the BasketBall
+    int num_segments = 100;
 
-glColor3f(1.0, 0.0, 0.0);
-
-int f=0,k=0,fx,kk=1,f1=0,f2=0,jx1,k2=1,jy;
-double jx;
-
-float y1=0, theta1 = ((3.1415926f)/180)*(th),x1=0;
-//cin >> th;
-
-for (double jj =0; jj< 600;jj = jj + 1) {
-//glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-glClear(GL_COLOR_BUFFER_BIT);
-//glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
-glBegin(GL_LINES);
-glVertex2f(20.0,25.0);
-glVertex2f(180.0,25.0);
-glEnd();
-glBegin(GL_LINES);
-glVertex2f(180.0,25.0);
-glVertex2f(170.0,60.0);
-//glVertex2f(24.0,50.0);
-glEnd();
-glBegin(GL_LINES);
-glVertex2f(170.0,60.0);
-glVertex2f(30.0,60.0);
-//glVertex2f(24.0,50.0);
-glEnd();
-glBegin(GL_LINES);
-glVertex2f(20.0,25.0);
-glVertex2f(30.0,60.0);
-//glVertex2f(24.0,50.0);
-glEnd();
-glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
-glBegin(GL_POLYGON);
-int cx1 = 25.0,cy1 = 42.5,r1 = 18;
-for(int ii = 0; ii < num_segments; ii++)
-
-{
+    for (double time =0; time< 600; time++) {    // Number of Iterations For Trajectory OF the Ball
+    glClear(GL_COLOR_BUFFER_BIT);
 
 
-float theta = 2.0f * 3.1415926f * float(ii) /
+                                    /*--------Basketball Court---------*/
+        glBegin(GL_LINES);
+        glVertex2f(20.0,25.0);
+        glVertex2f(210.0,25.0);
+        glEnd();
 
-float(num_segments);//get the current angle
+        glBegin(GL_LINES);
+        glVertex2f(210.0,25.0);
+        glVertex2f(200.0,80.0);
 
-float x = r1 * cosf(theta);//calculate the x
+        glEnd();
+        glBegin(GL_LINES);
+        glVertex2f(200.0,80.0);
+        glVertex2f(30.0,80.0);
 
-//component
+        glEnd();
+        glBegin(GL_LINES);
+        glVertex2f(20.0,25.0);
+        glVertex2f(30.0,80.0);
+        glEnd();
+                                    /*--------Basketball Ring---------*/
 
-float y = r1 * sinf(theta);//calculate the y
+            // The Circumference of Ring
 
-//component
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    float cx1 = 175.0,cy1 = 165.0,r1 = 7.5,num_segments = 1000;
+    float alpha = 2 * 3.1415926 / float(num_segments);
+        float c = cosf(alpha);//precalculate the sine and cosine
+        float s = sinf(alpha);
+        float t;
 
-glVertex2f(x + cx1, y + cy1);//output vertex
+        float x = r1;//we start at angle = 0
+        float y = 0;
 
-}
-glEnd();
-glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
-glBegin(GL_LINES);
-glVertex2f(160.0,165.0);
+        glBegin(GL_POLYGON);
+        for(int ii = 0; ii < num_segments; ii++)
+        {
+            glVertex2f(2*x + cx1, (0.5)*y + cy1);//output vertex
+
+            //apply the rotation matrix
+            t = x;
+            x = c * x - s * y;
+            y = s * t + c * y;
+        }
+        glEnd();
+
+                        // The Pole
+
+        glBegin(GL_LINES);
+        glVertex2f(190.0,185.0);
+        glVertex2f(190.0,150.0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex2f(190.0,165.0);
+        glVertex2f(200.0,150.0);
+        glEnd();
+
+        glBegin(GL_LINES);
+        glVertex2f(200.0,165.0);
+        glVertex2f(200.0,45.0);
+        glEnd();
+//glBegin(GL_POLYGON);
+
+/*glBegin(GL_LINES);
+glVertex2f(186.0,145.0);
 glVertex2f(190.0,165.0);
 //glVertex2f(24.0,50.0);
 glEnd();
-glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
 glBegin(GL_LINES);
-glVertex2f(40.0,105.0);
-glVertex2f(60.0,105.0);
+glVertex2f(164.0,145.0);
+glVertex2f(160.0,165.0);
 //glVertex2f(24.0,50.0);
 glEnd();
-glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
 glBegin(GL_LINES);
-glVertex2f(190.0,200.0);
-glVertex2f(190.0,45.0);
+glVertex2f(164.0,145.0);
+glVertex2f(186.0,145.0);
 //glVertex2f(24.0,50.0);
-glEnd();
-glPolygonMode(GL_FRONT_AND_BACK,GL_LINES);
-glBegin(GL_POLYGON);
+glEnd();*/
 
-for(int ii = 0; ii < num_segments; ii++)
+                        /*-------The Player-------*/
 
-{
+        // Player's Face
+
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    glBegin(GL_POLYGON);
+    cx1 = 30.0,cy1 = 92.5,r1 = 10;
+    for(int ii = 0; ii < num_segments; ii++)
+
+    {
 
 
-float theta = 2.0f * 3.1415926f * float(ii) /
+        float alpha = 2.0f * 3.1415926f * float(ii) / float(num_segments);//get the current angle
 
-float(num_segments);//get the current angle
+        float x = r1 * cosf(alpha);//calculate the x component
 
-float x = r * cosf(theta);//calculate the x
+        float y = r1 * sinf(alpha);//calculate the y component
 
-//component
+        glVertex2f(x + cx1, y + cy1);//output vertex
 
-float y = r * sinf(theta);//calculate the y
+    }
+    glEnd();
+            // Player's Hand
+    glBegin(GL_LINES);
+    glVertex2f(30.0,57.5);
+    glVertex2f(41.0,40.0);
+    glEnd();
+            // Player's Body
+    glBegin(GL_LINES);
+    glVertex2f(30.0,57.5);
+    glVertex2f(19.0,40.5);
+    glEnd();
+            // Player's Legs
+    glBegin(GL_LINES);
+    glVertex2f(50.0,105.0);
+    glVertex2f(30.0,70.0);
+    glEnd();
 
-//component
+    glBegin(GL_LINES);
+    glVertex2f(30.0,82.5);
+    glVertex2f(30.0,57.5);
+    glEnd();
 
-glVertex2f(x + 50 + cx, y + 200 + cy);//output vertex
+            /*---------The BasketBall-------*/
 
-}
-//x1 = 50;
-/*int y11;
-if (jj >= 5 && jj <=8)
-    y11 = -10;
-else if (jj>=9 && jj <=12)
-    y11 = 10;
-else if (jj>=13 && jj <=15)
-    y11 = -10;
-else if (jj>=16 && jj<=18)
-    y11 = 10;
-else if (jj>=19 && jj<=20)
-    y11 = -10;
-else if (jj>=21 && jj<=22)
-    y11 = 10;
-else if (jj==23)
-    y11 = -10;
-else if (jj<5)
-    y11 = 10;
-else
-    y11 = 10;
-if (jj <= 12)
-    usleep(105000);
-else if (jj >=12 && jj<=18)
-    usleep(150000);
-else
-    usleep(200000);*/
-double var = -1;
 
-cx = jj;
-cout << th << " ";
-if (th == 90) {
-    cy = (cx/0.0001) - ((9.81*cx*cx)/(2*2800*0.0001*0.0001));
-    cout  << cy << "   ";
-}
-else
-    cy = cx*tan(theta1) - ((9.81 * cx * cx)/(2*3500*cos(theta1)*cos(theta1)));
+        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+        glBegin(GL_POLYGON);
 
-//cy = (-9.81 * jj * jj)/2 + 100*(1/sqrt(2))*jj + 40;
-cx = (0.5)*cx;
+        for(int ii = 0; ii < num_segments; ii++)
 
-cy = cy - 90;
-if(f1 != 1 && f2!=1)
-//    cout << cx << " ";
-cout << cx << "  " << cy << "   ";
-//cout << cos(theta1) << "     ";
-if (((cy < -35.5 && cy > -40.5 && cx < 110 && cx> 109) || f1 == 1) && f != 1 && f2 != 1) {
-//    if ((cx < 110 && cx> 109) || (cx > 140))
-//        cout << "\n";
-        if (f1 == 0)
-            jx = cx;
+        {
+            float alpha = 2.0f * 3.1415926f * float(ii) / float(num_segments);//get the current angle
+
+            float x = r * cosf(alpha);//calculate the x component
+
+            float y = r * sinf(alpha);//calculate the y component
+
+            glVertex2f(x + 50 + cx, y + 200 + cy);//output vertex
+
+        }
+        glEnd();
+
+            /*---------Defining Trajectory Of The Ball--------*/
+
+    double var = -1;
+
+    cx = time;
+    cout << angle << " ";
+    if (angle == 90) {
+        cy = (cx/0.0001) - ((9.81*cx*cx)/(2*2800*0.0001*0.0001));
+    //    cout  << cy << "   ";
+    }
+    else
+        cy = cx*tan(theta) - ((9.81 * cx * cx)/(2*3500*cos(theta)*cos(theta)));
+    // equation of trajectory for projectile (x*tan(theta)-(g*x*x)/(2*velocity*velocity*cos(theta)*cos(theta)
+
+    cx = (0.5)*cx;
+
+    cy = cy - 90;
+if(flag1 != 1 && flag2!=1)
+    cout << cx << "  " << cy << "   ";
+
+    // IF Ball hits the Rim and Falls on the ground #NO SCORE
+
+    if (((cy < -35.5 && cy > -40.5 && cx < 110 && cx> 109) || flag1 == 1) && flag != 1 && flag2 != 1 && flag3!=1) {
+
+        if (flag1 == 0)
+            X_BallHitsRim = cx;
+
         cx = cx - 0.25;
-        cy = cx*tan(theta1) - ((9.81 * cx * cx)/(2*2800*cos(theta1)*cos(theta1)));
+        cy = cx*tan(theta) - ((9.81 * cx * cx)/(2*3500*cos(theta)*cos(theta)));
 
         cy = cy-90;
-        kk+=2;
-        f1 = 1;
-        usleep(4000);
-//        cout << cx << "  " << cy << "\n";
-        cout << cx << "-";
+        flag1 = 1;
+        usleep(2000);
         if (cx == 0) {
             cout << "cx = 0\n";
             break;
         }
-       // break;
-}
-else if ((cy > -5 || f==1) && (f2 != 1)) {
-    if (f == 0)
-        fx = cx;
-    f=1;
-    cx = fx;
-    cy = k--;
-    usleep(3000);
-}
-else
-    usleep(2000);
-if (cy < -151 && f2 != 1) {
-         cout << "cy < -151 -- 1\n";
-        break;
     }
-if (cx > 135 || f2 == 1) {
-    if (f2 == 0){
-        jx1 = cx;
-        jy = cy;
-    }
-    f2 = 1;
-    cx= k2;
-    k2++;
-    cy = -((9.81 * cx * cx)/(2*2800));
- //   cy = (2800 * k2) - (0.5 * 9.81 * k2 * k2);
-    cx = jx1-(k2*0.5);
-    cy = jy + cy ;
-    cout << cx << "  " << cy << "   ";
-    if (cy < -151) {
-         cout << "cy < -151 -- 2\n";
-        break;
-    }
-}
-cout << jj << "  ";
-  //  break;
-  glEnd();
 
+    // IF Ball hits the ceiling #NO SCORE
+    else if ((cy > -5 || flag==1) && (flag2 != 1)) {
+       if (flag == 0)
+            X_BallHitsCeiling = cx;
+        flag=1;
+        cx = X_BallHitsCeiling;
+        cy = Y_BallHitsCeiling--;
+        usleep(3000);
+    }
 
-glFlush();
+    // IF Ball goes into the Basket #SCORE
+    else if ((cx > 110 && cx < 140 && cy < -35.5 && cy > -40.5 && flag2 != 1 && flag!= 1 && flag1 != 1)||flag3==1) {
+        if (flag3 == 0) {
+            X_BallInBasket = cx;
+            Y_BallInBasket = cy;
+        }
+        flag3 = 1;
+        cx = X_BallInBasket;
+        cy = Y_BallInBasket--;
+        usleep(2000);
+    }
+    else
+        usleep(2000);
+
+    // IF Ball hits the Ground
+
+    if (cy < -151 && flag2 != 1) {
+             cout << "cy < -151 -- 1\n";
+            break;
+    }
+
+    // IF Ball hits The Pole #NO SCORE
+
+    if (cx > 145 || flag2 == 1) {
+        if (flag2 == 0){
+            X_BallHitsPole = cx;
+            Y_BallHitsPole = cy;
+        }
+        flag2 = 1;
+        cx= RelativeX_BallHitsPole;
+        RelativeX_BallHitsPole++;
+        cy = -((9.81 * cx * cx)/(2*2800));
+     //   cy = (2800 * k2) - (0.5 * 9.81 * k2 * k2);
+        cx = X_BallHitsPole-(RelativeX_BallHitsPole*0.5);
+        cy = Y_BallHitsPole + cy ;
+        cout << cx << "  " << cy << "   ";
+
+        // IF Ball hits Ground after it hits the pole
+        if (cy < -151) {
+             cout << "cy < -151 -- 2\n";
+            break;
+        }
+    }
+    glEnd();
+    glFlush();
 
 }
 //glutKeyboardFunc( keyboard );
 //cin >> th;
-th++;
+angle++;
 }
 //glFlush();
 
-}
+
 int main(int argc, char *argv[])
 
 {
+    for (int i=0;i<10;i++) {
 
-// glutInit will initialize the GLUT library and
+        cin >> angle;
+        glutInit(&argc,argv);
 
-//negotiate a session with the window system.
-for (int i=0;i<10;i++) {
+        glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
-cin >> th;
-    cout << "hello\n";
-glutInit(&argc,argv);
+        glutInitWindowSize(500, 500);
 
-// Select a display mode with single buffer because
+        glutInitWindowPosition(700, 0);
 
-//its a simple application and Red, green, blue
+        glutCreateWindow("Lab-1(b)_1");
 
-//framebuffer
+        init2D(0.0, 0.0, 0.0);
 
-glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-
-glutInitWindowSize(500, 500);
-
-glutInitWindowPosition(700, 0);
-
-glutCreateWindow("Lab-1(b)_1");
-
-init2D(0.0, 0.0, 0.0);
-
-// calls the function display everytime the display
-
-//needs to be updated
-//glutKeyboardFunc( keyboard );
-glutDisplayFunc(display);
-glutMainLoop();
-cout << "end\n";
-}
-
-
-
+        glutDisplayFunc(display);
+        glutMainLoop();
+    }
 }
