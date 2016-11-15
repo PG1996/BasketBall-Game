@@ -1,4 +1,3 @@
-
 #include <GL/glut.h >
 #include <bits/stdc++.h>
 #include <stdlib.h>
@@ -25,6 +24,7 @@ void display(void)
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 0.0, 0.0);
 
+    while (angle <90) {
     int flag = 0; //IF Ball hits the ceiling
     int flag1 = 0; //IF Ball hits the Rim and Falls on the ground
     int flag2 = 0; //IF Ball hits The Pole
@@ -32,8 +32,8 @@ void display(void)
 
     /*------Different co-ordinates for Ball*/
 
-    int Y_BallHitsCeiling = 0, RelativeX_BallHitsPole = 1;
-    double X_BallHitsCeiling, X_BallHitsRim, X_BallInBasket, Y_BallInBasket, X_BallHitsPole, Y_BallHitsPole;
+    int Y_BallHitsCeiling = 0, RelativeX_BallHitsPole = 1,RelativeX_BallHitsRim = 1;
+    double X_BallHitsCeiling, X_BallHitsRim, Y_BallHitsRim, X_BallInBasket, Y_BallInBasket, X_BallHitsPole, Y_BallHitsPole;
 
     float theta = ((3.1415926f)/180)*(angle);
     double cx = 100, cy = 100, r = 5;       // Center Coordinates and Radius Of the BasketBall
@@ -202,17 +202,34 @@ void display(void)
         // IF Ball hits the Rim and Falls on the ground #NO SCORE
         if (((cy < -35.5 && cy > -40.5 && cx < 110 && cx > 109) || flag1 == 1) && flag != 1 && flag2 != 1 && flag3 != 1) {
 
-            if (flag1 == 0)
+            /*if (flag1 == 0)
                 X_BallHitsRim = cx;
-
             cx = cx - 0.25;
             cy = cx * tan(theta) - ((9.81 * cx * cx) / (2 * 3500 * cos(theta) * cos(theta)));
-
             cy = cy - 90;
             flag1 = 1;
             usleep(2000);
             if (cx == 0) {
                 cout << "cx = 0\n";
+                break;
+            }*/
+
+            if (flag1 == 0) {
+                X_BallHitsRim = cx;
+                Y_BallHitsRim = cy;
+            }
+            flag1 = 1;
+            cx = RelativeX_BallHitsRim;
+            RelativeX_BallHitsRim++;
+            cy = -((9.81 * cx * cx) / (2 * 2800));
+            //   cy = (2800 * k2) - (0.5 * 9.81 * k2 * k2);
+            cx = X_BallHitsRim - (RelativeX_BallHitsRim * 0.5);
+            cy = Y_BallHitsRim + cy;
+            cout << cx << "  " << cy << "   ";
+            usleep(4000);
+            // IF Ball hits Ground after it hits the pole
+            if (cy < -151) {
+                cout << "cy < -151 -- 2\n";
                 break;
             }
         }
@@ -237,7 +254,9 @@ void display(void)
             cx = X_BallInBasket;
             cy = Y_BallInBasket--;
             usleep(2000);
-        } else
+        }
+
+        else
             usleep(2000);
 
         // IF Ball hits the Ground
@@ -273,6 +292,7 @@ void display(void)
     //glutKeyboardFunc( keyboard );
     //cin >> th;
     angle++;
+    }
 }
 //glFlush();
 
