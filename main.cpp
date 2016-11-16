@@ -6,13 +6,13 @@
 #include <string>
 using namespace std;
 
-int score=0,miss,level = 2,X_level=0,attempts,number;
+int score=0,level = 2,X_level=0,attempts;
 double angle,velocity;
 string level_EMH;
 void *font = GLUT_BITMAP_TIMES_ROMAN_24;
 char *message;
 int temp = attempts;
-void output(int x, int y, char *string)
+void output(int x, int y, char *string)  /// The Function To Print on Window
 {
     int len, i;
     glRasterPos2f(x, y);
@@ -29,19 +29,16 @@ void init2D(float r, float g, float b)
 }
 void display(void)
 {
-    number =0;
-    miss=0;
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 0.0, 0.0);
     while (attempts!=-1)
     {
-        number++;
         int flag = 0;  ///IF Ball hits the ceiling
         int flag1 = 0; ///IF Ball hits the Rim and Falls on the ground
         int flag2 = 0; ///IF Ball hits The Pole
         int flag3 = 0; ///IF Ball goes into the Basket
 
-        /*------Different co-ordinates for Ball*/
+        ///*------Different co-ordinates for Ball*///
 
         int Y_BallHitsCeiling = 0, RelativeX_BallHitsPole = 1,RelativeX_BallHitsRim = 1;
         double X_BallHitsCeiling, X_BallHitsRim, Y_BallHitsRim, X_BallInBasket, Y_BallInBasket, X_BallHitsPole, Y_BallHitsPole;
@@ -49,14 +46,12 @@ void display(void)
         float theta = ((3.1415926f)/180)*(angle);
         double cx = 100, cy = 100, r = 5;       /// Center Coordinates and Radius Of the BasketBall
 
-        char buffer2[33];
-
-
         for (double time = 0; time < 600; time++)
         {                                       /// Number of Iterations For Trajectory OF the Ball
             glClear(GL_COLOR_BUFFER_BIT);
 
-            /*--------Background---------*/
+            ///*--------Background---------*///
+
             glBegin(GL_POLYGON);
             glColor3f( 0.35f, 0.35f, 0.35f);
             glVertex2f(0.0, 0.0);
@@ -88,7 +83,7 @@ void display(void)
             glVertex2f(0.0, 90.0);
             glEnd();
 
-            /*--------Basketball Court---------*/
+            ///*--------Basketball Court---------*///
 
             glBegin(GL_POLYGON);
             glColor3f( 0.137255f, 0.137255f, 0.556863f);
@@ -106,6 +101,7 @@ void display(void)
             glEnd();
 
             ///output Message
+
             glColor3f(0.85f, 0.85f, 0.1f);
             output(10,190,"Attempts Left :");
             glColor3f(0.85f, 0.85f, 0.1f);
@@ -118,10 +114,10 @@ void display(void)
             glColor3f(0.85f, 0.85f, 0.1f);
             itoa (score,buffer1,10);
             output(73,170,buffer1);
-           // cout << "miss" << miss << endl;
 
 
             ///Court Boundary
+
             glBegin(GL_LINES);
             glColor3f(0.85f, 0.85f, 0.1f);
             glVertex2f(0.0, 25.0);
@@ -172,7 +168,7 @@ void display(void)
             glVertex2f(115.0, 80.0);
             glEnd();
 
-            /*--------Basketball Ring---------*/
+            ///*--------Basketball Ring---------*///
 
             /// The Circumference of Ring
 
@@ -197,7 +193,9 @@ void display(void)
             }
             glEnd();
 
+
             ///Basket Net
+
             alpha = 2 * 3.1415926 / float(40);
             c = cosf(alpha); ///pre calculate the sine and cosine
             s = sinf(alpha);
@@ -219,7 +217,8 @@ void display(void)
             }
             glEnd();
 
-            ///making the boundary of circumference bold
+            ///making the boundary of circumference thicker
+
             alpha = 2 * 3.1415926 / float(num_segments);
             c = cosf(alpha); ///pre calculate the sine and cosine
             s = sinf(alpha);
@@ -235,6 +234,8 @@ void display(void)
                 y = s * t + c * y;
             }
             glEnd();
+
+
             /// The Pole
 
             glBegin(GL_LINES);
@@ -274,6 +275,7 @@ void display(void)
         if (level == 1)
         {
             X_level = 0;
+
             /// Player's Face
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -353,6 +355,8 @@ void display(void)
             glVertex2f(20.0, 40.5);
             glEnd();
         }
+
+
         if (level == 2)
         {
              X_level = 10;
@@ -436,9 +440,12 @@ void display(void)
              glVertex2f(3.0, 48.5);
              glEnd();
          }
-            if (level == 3)
+
+
+         if (level == 3)
          {
              X_level = -30;
+
             /// Player's Face
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -519,7 +526,8 @@ void display(void)
             glVertex2f(50.0, 40.5);
             glEnd();
         }
-            /*---------The BasketBall-------*/
+
+            ///*---------The BasketBall-------*///
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glBegin(GL_POLYGON);
@@ -533,7 +541,7 @@ void display(void)
             }
             glEnd();
 
-            /*------Boundary of ball---*/
+            ///*------Boundary of ball---*//
 
             glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
             glBegin(GL_POLYGON);
@@ -547,7 +555,7 @@ void display(void)
             }
             glEnd();
 
-            /*----Strips of ball----*/
+            ///*----Strips of ball----*///
 
             glBegin(GL_LINES);
             glColor3f(0.0f, 0.0f,0.0f);
@@ -576,7 +584,7 @@ void display(void)
             glVertex2f(x3 + 50 + cx - X_level, y3 + 200 + cy);
             glEnd();
 
-            /*---------Defining Trajectory Of The Ball--------*/
+            ///*---------Defining Trajectory Of The Ball--------*///
 
             cx = time;
             if (angle == 90)
@@ -587,6 +595,7 @@ void display(void)
             cy = cy - 90;
 
             /// IF Ball hits the Rim and Falls on the ground #NO SCORE
+
             if (((cy < -35.5 && cy > -40.5 && cx < (110+X_level) && cx > (109+X_level)) || flag1 == 1) && flag != 1 && flag2 != 1 && flag3 != 1)
             {
                 if (flag1 == 0)
@@ -609,6 +618,7 @@ void display(void)
                     break;
                 }
             }
+
             /// IF Ball hits the ceiling #NO SCORE
             else if ((cy > -5 || flag == 1) && (flag2 != 1))
             {
@@ -620,6 +630,7 @@ void display(void)
                 cy = Y_BallHitsCeiling--;
                 usleep(100);
             }
+
             /// IF Ball goes into the Basket #SCORE
             else if ((cx > (110+X_level) && cx < (140+X_level) && cy < -35.5 && cy > -40.5 && flag2 != 1 && flag != 1 && flag1 != 1) || flag3 == 1)
             {
@@ -630,11 +641,11 @@ void display(void)
                     score++;
                 }
                 glColor3f(1.0f, 0.5f, 0.0f);
-                output(60,120,"YO! BITCH BASKET");
+                output(30,120,"YO! THAT'S A BASKET MAN :) ");
                 flag3 = 1;
                 cx = X_BallInBasket;
                 cy = Y_BallInBasket--;
-                usleep(100);
+                usleep(30);
             }
           //  else
             //    usleep(100);
